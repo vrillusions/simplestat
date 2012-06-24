@@ -1,0 +1,17 @@
+# Requirements
+
+- redis (Give link to ppa)
+- redis-py (simply called 'redis' in `pip` and `easy_install`)
+
+# Notes
+
+According redis' own documentation (link to their faq) redis uses a lot less memory on a 32 bit system.  For most implementations of this we aren't storing a whole lot of data and since this may be running on a small VPS if you can get it in 32bit, do it
+
+# FAQ
+
+- Why not use redis for everything?
+  - While I could use redis for messaging directly--where all the client nodes connect directly to the redis server and put their data on it--that exposes the entire redis database to the outside world.  Sure things can be locked down to specific ips and such but you're still exposing the entire API to all clients.  With the model used here we're sending a single small udp packet to the server.  If it doesn't receive it? o well it will get another in a little bit.  Failure is assumed.  A watch script can check periodically for servers that haven't responded in a while and send out an email.
+- Why redis and not something else?
+  - short answer: because there are features in redis that intrigue me.
+
+  For example, there's atomic increments of values.  Meaning two clients could say "increment 'errorcount'" at the same time and redis will increase the value twice.  While not used in this project that could be worthwhile for profiling code and see what functions are used the most.  That's just one example.  Downside with redis is the entire database is stored in RAM.  Since this may be running on a VPS with limited RAM that could be a dealbreaker.  It shouldn't be to much of an issue even up to a few hundred servers.
